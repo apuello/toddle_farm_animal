@@ -97,21 +97,40 @@ var GameState = {
     
   },
   switchAnimal: function(sprite, event){
+    
+    if (this.isMoving) { return false;}
+
+    this.isMoving = true;
+
     var newAnimal, endX;
 
     //1. get the direction of the arrow
     if (sprite.customParams.direction > 0) {
       newAnimal = this.animals.next();
+      newAnimal.x = -newAnimal.width/2;
       endX = 640 + this.currentAnimal.width/2;
     }else{
       newAnimal = this.animals.previous();
+      newAnimal.x = 640 + newAnimal.width/2;
       endX = - this.currentAnimal.width/2;
     }
 
-    this.currentAnimal.x = endX;
+    var newAnimalMovement = game.add.tween(newAnimal);
+    newAnimalMovement.to({x: this.game.world.centerX}, 1000);//this tween will take 1 second by defualt, we added the 1 second anyway
+    newAnimalMovement.onComplete.add(function(){
+      this.isMoving = false;
+    }, this);
+    newAnimalMovement.start();
 
-    newAnimal.x = this.game.world.centerX;
+    var currentAnimalMovement = this.game.add.tween(this.currentAnimal);
+    currentAnimalMovement.to({x: endX});
+    currentAnimalMovement.start();
+
+    // this.currentAnimal.x = endX;
+
+    // newAnimal.x = this.game.world.centerX;
     this.currentAnimal = newAnimal;
+
     //2. get next animal
     //3. get final destination of current animal
     //4. move current animal to final destination
