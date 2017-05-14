@@ -29,21 +29,6 @@ var GameState = {
 
     this.background = this.game.add.sprite(0, 0, 'background');
     
-    // this.chicken = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'chicken');
-    // this.chicken.anchor.setTo(0.5);
-    // this.chicken.scale.setTo(2,1);
-
-    // this.horse = this.game.add.sprite(120, 10, 'horse');
-    // this.horse.scale.setTo(0.5);
-
-    // this.pig = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'pig');
-    // this.pig.anchor.setTo(0.5);
-    // this.pig.scale.setTo(-1, 1);
-
-    //enable input on pig
-    // this.pig.inputEnabled = true;
-    // this.pig.input.pixelPerfectClick = true;
-    // this.pig.events.onInputDown.add(this.animateAnimal, this);
 
     //group for animals
     var animalData = [
@@ -74,14 +59,12 @@ var GameState = {
       animal.events.onInputDown.add(self.animateAnimal, self);
     });
 
+    //place first animal in the middle
     this.currentAnimal = this.animals.next();
     this.currentAnimal.position.set(this.game.world.centerX, this.game.world.centerY)
     
-
-    // this.sheep = this.game.add.sprite(100, 250, 'sheep');
-    // this.sheep.scale.setTo(0.5);
-    // this.sheep.anchor.setTo(0.5);
-    // this.sheep.angle = -45;
+    //show animal text
+    this.showText(this.currentAnimal);
 
     //left arrow
     this.leftArrow = this.game.add.sprite(60, this.game.world.centerY, 'arrow');
@@ -118,6 +101,9 @@ var GameState = {
 
     this.isMoving = true;
 
+    //hide text
+    this.animalText.visible = false;
+
     var newAnimal, endX;
 
     //1. get the direction of the arrow
@@ -131,26 +117,40 @@ var GameState = {
       endX = - this.currentAnimal.width/2;
     }
 
+    //2. get next animal
     var newAnimalMovement = game.add.tween(newAnimal);
     newAnimalMovement.to({x: this.game.world.centerX}, 1000);//this tween will take 1 second by defualt, we added the 1 second anyway
     newAnimalMovement.onComplete.add(function(){
       this.isMoving = false;
+      this.showText(newAnimal);
     }, this);
     newAnimalMovement.start();
 
+    //3. get final destination of current animal
     var currentAnimalMovement = this.game.add.tween(this.currentAnimal);
+
+    //4. move current animal to final destination
     currentAnimalMovement.to({x: endX});
     currentAnimalMovement.start();
 
-    // this.currentAnimal.x = endX;
 
-    // newAnimal.x = this.game.world.centerX;
+    //5. set the next animal as the new current animal
     this.currentAnimal = newAnimal;
 
-    //2. get next animal
-    //3. get final destination of current animal
-    //4. move current animal to final destination
-    //5. set the next animal as the new current animal
+  },
+  showText: function(animal){
+    if (!this.animalText) {
+      var style = {
+        font: 'bold 30pt Arial',
+        fill:'#D0171B',
+        align: 'center'
+      }
+      
+      this.animalText = this.game.add.text(this.game.width/2, this.game.height * 0.85, '');
+      this.animalText.anchor.setTo(0.5);
+    }
+    this.animalText.setText(animal.customParams.text);
+    this.animalText.visible = true;
   }
   
 
